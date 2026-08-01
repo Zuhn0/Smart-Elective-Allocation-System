@@ -1,0 +1,4 @@
+frontend : https://vercel.com/student-c5da/smart-elective-allocation-system
+backend: https://dashboard.render.com/
+         https://smart-elective-allocation-system.onrender.com/
+sql : https://console.neon.tech/app/projects/damp-tree-22764951

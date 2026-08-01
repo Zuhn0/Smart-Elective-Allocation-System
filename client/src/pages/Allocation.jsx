@@ -57,7 +57,7 @@ function Allocation() {
           <Button
       variant="outlined"
       sx={{ ml: 2 }}
-      href="http://localhost:5000/allocation/export"
+      href="https://smart-elective-allocation-system.onrender.com/allocation/export"
     >
       Export CSV
     </Button>
