@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Student {
+  id         Int    @id @default(autoincrement())
+  rollNumber String @unique
+  name       String
+  email      String @unique
+  cgpa       Float
+  department String
+
+  preferences Preference[]
+  allocation  Allocation?
+}
+
+
+
+model Elective {
+  id       Int    @id @default(autoincrement())
+  code     String @unique
+  name     String
+  credits  Int
+  capacity Int
+
+  preferences Preference[]
+  allocations Allocation[]
+}
+
+model Preference {
+  id Int @id @default(autoincrement())
+
+  rank Int
+
+  studentId Int
+  electiveId Int
+
+  student Student @relation(fields: [studentId], references: [id])
+  elective Elective @relation(fields: [electiveId], references: [id])
+
+  @@unique([studentId, electiveId])
+  @@unique([studentId, rank])
+}
+
+model Allocation {
+  id Int @id @default(autoincrement())
+
+  studentId  Int @unique
+  electiveId Int
+
+  student  Student  @relation(fields: [studentId], references: [id])
+  elective Elective @relation(fields: [electiveId], references: [id])
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+}
