@@ -1,62 +1,154 @@
 import { useState } from "react";
 import {
-  Paper,
   TextField,
   Button,
+  Paper,
   Typography,
-  Stack,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 
 function Login() {
-  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("admin");
 
-  const login = async () => {
-    try {
-      const res = await api.post("/admin/login", {
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+
+
+
+  const handleLogin = async()=>{
+
+    try{
+
+      let url="";
+
+      if(role==="admin"){
+        url="/admin/login";
+      }
+      else{
+        url="/student/auth/login";
+      }
+
+
+      const res = await api.post(url,{
         email,
-        password,
+        password
       });
 
-      localStorage.setItem("token", res.data.token);
 
-      navigate("/");
-    } catch (err) {
-      alert("Invalid Credentials");
+      localStorage.setItem(
+        "token",
+        res.data.token
+      );
+
+      localStorage.setItem(
+      "student",
+       JSON.stringify(res.data.student)
+      );
+
+      localStorage.setItem(
+        "role",
+        role
+      );
+
+
+      if(role==="admin"){
+        window.location.href="/";
+      }
+      else{
+        window.location.href="/student/dashboard";
+      }
+
+
     }
+    catch(error){
+
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Login failed"
+      );
+
+    }
+
   };
 
+
+
   return (
-    <Paper sx={{ width: 400, p: 4, mx: "auto", mt: 10 }}>
-      <Typography variant="h5" mb={3}>
-        Admin Login
+
+    <Paper
+      sx={{
+        width:400,
+        margin:"100px auto",
+        padding:4
+      }}
+    >
+
+      <Typography variant="h5">
+        Login
       </Typography>
 
-      <Stack spacing={2}>
-        <TextField
-          label="Email"
-          onChange={(e) => setEmail(e.target.value)}
+
+      <RadioGroup
+        row
+        value={role}
+        onChange={(e)=>setRole(e.target.value)}
+      >
+
+        <FormControlLabel
+          value="admin"
+          control={<Radio />}
+          label="Admin"
         />
 
-        <TextField
-          type="password"
-          label="Password"
-          onChange={(e) => setPassword(e.target.value)}
+        <FormControlLabel
+          value="student"
+          control={<Radio />}
+          label="Student"
         />
 
-        <Button
-          variant="contained"
-          onClick={login}
-        >
-          Login
-        </Button>
-      </Stack>
+      </RadioGroup>
+
+
+
+      <TextField
+        fullWidth
+        label="Email"
+        margin="normal"
+        value={email}
+        onChange={(e)=>setEmail(e.target.value)}
+      />
+
+
+      <TextField
+        fullWidth
+        label="Password"
+        type="password"
+        margin="normal"
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
+      />
+
+
+      <Button
+        fullWidth
+        variant="contained"
+        onClick={handleLogin}
+      >
+        Login
+      </Button>
+
+
     </Paper>
+
   );
 }
+
 
 export default Login;

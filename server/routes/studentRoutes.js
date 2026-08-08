@@ -9,6 +9,10 @@ const {
   deleteStudent,
 } = require("../controllers/studentController");
 
+const {
+resetStudentPassword
+}=require("../controllers/studentController");
+
 router.post("/", createStudent);
 
 router.get("/", getAllStudents);
@@ -22,5 +26,10 @@ router.post("/", authenticateAdmin, createStudent);
 router.put("/:id", authenticateAdmin, updateStudent);
 
 router.delete("/:id", authenticateAdmin, deleteStudent);
+
+router.put(
+"/:id/reset-password",
+resetStudentPassword
+);
 
 module.exports = router;

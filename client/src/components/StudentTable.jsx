@@ -1,132 +1,264 @@
 import {
-  Paper,
   Table,
+  TableBody,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
+  Paper,
   Button,
-  Typography,
 } from "@mui/material";
 
 import api from "../services/api";
 
+
 function StudentTable({
   students,
   refreshStudents,
-  search,
+  search
 }) {
 
-  const deleteStudent = async (id) => {
 
-    if (!window.confirm("Delete Student?"))
-      return;
+  const deleteStudent = async(id)=>{
 
-    try {
+    try{
 
       await api.delete(`/students/${id}`);
 
+      alert("Student deleted successfully");
+
       refreshStudents();
 
-    } catch (err) {
+    }
+    catch(error){
 
-      console.log(err);
+      console.log(error);
 
-      alert("Delete Failed");
+      alert("Failed to delete student");
 
     }
 
   };
 
+
+
+  const resetPassword = async(id)=>{
+
+
+    const password = prompt(
+      "Enter new password for student:"
+    );
+
+
+    if(!password)
+      return;
+
+
+
+    try{
+
+
+      await api.put(
+        `/students/${id}/reset-password`,
+        {
+          password
+        }
+      );
+
+
+      alert(
+        "Password updated successfully"
+      );
+
+
+    }
+    catch(error){
+
+      console.log(error);
+
+      alert(
+        "Password reset failed"
+      );
+
+    }
+
+  };
+
+
+
+  const filteredStudents = students.filter((student)=>{
+
+
+    const value = search?.toLowerCase() || "";
+
+
+    return (
+
+      student.name
+      .toLowerCase()
+      .includes(value)
+
+      ||
+
+      student.email
+      .toLowerCase()
+      .includes(value)
+
+      ||
+
+      student.rollNumber
+      .toLowerCase()
+      .includes(value)
+
+    );
+
+  });
+
+
+
   return (
 
-    <Paper sx={{ p: 2 }}>
-
-      <Typography
-        variant="h6"
-        mb={2}
-      >
-        Student List
-      </Typography>
+    <Paper
+      sx={{
+        mt:3,
+        overflow:"auto"
+      }}
+    >
 
       <Table>
 
-        <TableHead>
+
+        <TableHead
+          sx={{
+            backgroundColor:"#1976d2"
+          }}
+        >
 
           <TableRow>
 
-            <TableCell>Roll No</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              Roll No
+            </TableCell>
 
-            <TableCell>Name</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              Name
+            </TableCell>
 
-            <TableCell>Email</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              Email
+            </TableCell>
 
-            <TableCell>CGPA</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              CGPA
+            </TableCell>
 
-            <TableCell>Department</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              Department
+            </TableCell>
 
-            <TableCell>Action</TableCell>
+            <TableCell sx={{color:"white",fontWeight:"bold"}}>
+              Actions
+            </TableCell>
+
 
           </TableRow>
 
         </TableHead>
 
+
+
+
         <TableBody>
 
-          {students
-.filter(student =>
-    student.name.toLowerCase().includes(search.toLowerCase()) ||
-    student.rollNumber.toLowerCase().includes(search.toLowerCase())
-).map((student) => (
 
-            <TableRow key={student.id}>
+        {
+          filteredStudents.map((student)=>(
+
+
+            <TableRow
+              key={student.id}
+            >
+
 
               <TableCell>
                 {student.rollNumber}
               </TableCell>
 
+
               <TableCell>
                 {student.name}
               </TableCell>
+
 
               <TableCell>
                 {student.email}
               </TableCell>
 
+
               <TableCell>
                 {student.cgpa}
               </TableCell>
+
 
               <TableCell>
                 {student.department}
               </TableCell>
 
+
+
               <TableCell>
 
+
                 <Button
-                  color="error"
+                  variant="outlined"
+                  color="warning"
+                  size="small"
+                  sx={{mr:1}}
+                  onClick={()=>
+                    resetPassword(student.id)
+                  }
+                >
+
+                  Reset Password
+
+                </Button>
+
+
+
+                <Button
                   variant="contained"
-                  onClick={() =>
+                  color="error"
+                  size="small"
+                  onClick={()=>
                     deleteStudent(student.id)
                   }
                 >
+
                   Delete
+
                 </Button>
+
 
               </TableCell>
 
+
             </TableRow>
 
-          ))}
+
+          ))
+        }
+
 
         </TableBody>
 
+
       </Table>
+
 
     </Paper>
 
   );
 
 }
+
 
 export default StudentTable;

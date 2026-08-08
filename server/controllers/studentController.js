@@ -1,14 +1,18 @@
 const prisma = require("../config/prisma");
 
+const bcrypt=require("bcrypt");
 const createStudent = async (req, res) => {
   try {
     const { rollNumber, name, email, cgpa, department } = req.body;
+    const hashedPassword =
+await bcrypt.hash("123456",10);
 
     const student = await prisma.student.create({
       data: {
         rollNumber,
         name,
         email,
+        password: hashedPassword,
         cgpa: parseFloat(cgpa), // Ensure CGPA is stored as a float
         department,
       },
@@ -60,6 +64,53 @@ const updateStudent = async (req, res) => {
   }
 };
 
+
+const resetStudentPassword = async (req,res)=>{
+
+  try{
+
+    const id = Number(req.params.id);
+
+    const { password } = req.body;
+
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
+
+
+    const student = await prisma.student.update({
+
+      where:{
+        id
+      },
+
+      data:{
+        password: hashedPassword
+      }
+
+    });
+
+
+    res.json({
+      message:"Password updated successfully"
+    });
+
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      message:"Password reset failed"
+    });
+
+  }
+
+};
+
 const deleteStudent = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -101,6 +152,7 @@ const deleteStudent = async (req, res) => {
 
 module.exports = {
   createStudent,
+  resetStudentPassword,
   getAllStudents,
   updateStudent,
   deleteStudent,
